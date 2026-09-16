@@ -1,6 +1,6 @@
 # Java学习路线
 
-> 来源：程序员鱼皮《Java 学习路线》思维导图，原图见 assets/java-roadmap.png
+> Java 学习路线总览，原图见 assets/java-roadmap.png
 
 ![[java-roadmap.png]]
 

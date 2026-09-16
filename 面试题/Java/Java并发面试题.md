@@ -21,34 +21,24 @@ newFixedThreadPool ：固定大小线程池，但用的是 LinkedBlockingQueue �
 
 ```
 new ThreadPoolExecutor(
-```
 
 4,
 
-```
 // 核心线程
-```
 
 8,
 
-```
 // 最大线程
-```
 
-```
 60L,
-```
 
-```
 // 空闲存活秒数
-```
 
-```
 TimeUnit.SECONDS,
 new ArrayBlockingQueue<>(100), // 有界队列 new ThreadPoolExecutor.CallerRunsPolicy() // 拒绝策略
-```
 
 );
+```
 
 队列选 ArrayBlockingQueue 这种有界的，拒绝策略根据业务选，比如记录日志或让调用者自己执行。
 
@@ -60,11 +50,8 @@ synchronized 修饰普通方法时，锁的是当前实例对象，也就是 thi
 public class UserService {
 public synchronized void instanceMethod() {
 // 锁 this
-```
-
 }
 
-```
 public static synchronized void staticMethod() {
 // 锁 UserService.class
 } }
@@ -81,7 +68,11 @@ while (flag) { if (condition()) break;
 ```
 
 Thread.sleep(0); // 主动让出时间片，减少 CPU 消耗
+
+```
 }
+```
+
 4）和 Thread.yield() 的区别在于， yield() 只是建议调度器切换，而 sleep(0) 一定会进入定时器等待队 列再被唤醒，开销稍大，但行为更确定。
 
 这个操作在现代并发编程里很少手动写了，像 LockSupport.park() 或者 synchronized 优化后的自旋机制都 做得更智能了。但在理解线程调度逻辑时，它是个很好的切入点。
@@ -122,11 +113,7 @@ Netty 对性能的要求非常极致，特别是在高并发场景下处理海�
 ```
 public class FastThreadLocal<T> { private final int index;
 public FastThreadLocal() { this.index = InternalThreadLocalMap.nextIndex();
-```
-
 }
-
-```
 public final void set(T value) { InternalThreadLocalMap threadMap = InternalThreadLocalMap.get(); threadMap.setIndexedVariable(index, value);
 } }
 ```
@@ -150,11 +137,8 @@ userIdHolder.set(123L);
 // 业务逻辑
 } finally {
 userIdHolder.remove(); //
-```
-
 }
 
-```
 remove
 ```
 
@@ -168,9 +152,7 @@ InheritableThreadLocal 解决的是父子线程间 ThreadLocal 数据传递的�
 
 ```
 public class InheritableThreadLocal<T> extends ThreadLocal<T> { protected T childValue(T parentValue) { return parentValue;
-```
 
-```
 } }
 整个机制依赖 Thread 类内部两个字段：threadLocals 和 inheritableThreadLocals，都是由 ThreadLocalMap 持有。
 ```
@@ -269,18 +251,14 @@ ReentrantReadWriteLock lock = new ReentrantReadWriteLock(); Lock readLock = lock
 readLock.lock(); try {
 // 读取共享资源
 } finally { readLock.unlock();
-```
-
 }
-
-```
 // 写操作
 writeLock.lock(); try {
 // 修改共享资源
 } finally { writeLock.unlock();
+}
 ```
 
-}
 要注意的是，锁降级需要手动控制顺序：先获取写锁，再获取读锁，然后释放写锁。反过来就不行。
 
 使用不当容易造成饥饿问题，比如写线程一直抢不到锁，因为读线程太多。这时候可以考虑 StampedLock ，它支持 乐观读，性能更好，但使用复杂度也更高。
@@ -315,9 +293,9 @@ wait 、 notify 和 notifyAll 是 Java 中用于线程间协作的机制，它�
 ```
 synchronized (lock) { while (conditionNotMet) { lock.wait(); }
 // 处理逻辑
+}
 ```
 
-}
 这里用 while 而不是 if ，是因为可能存在虚假唤醒（spurious wakeup），即使没人通知，线程也可能自己醒 来。 如果多个线程等待不同条件，用 notify 可能只唤醒了一个无关线程，导致死锁。这种情况下必须用 notifyAll ，或者改用 ReentrantLock 配合 Condition ，控制更精细。
 
 ## 21. Java 中什么情况会导致死锁？如何避免？
@@ -336,9 +314,9 @@ volatile 关键字主要解决多线程环境下的可见性和指令重排序�
 
 ```
 synchronized (this) { count++;
+}
 ```
 
-}
 JVM 会通过对象的监视器锁（Monitor）来实现，线程进入时尝试获取锁，拿不到就阻塞，拿到才能往下走，执行完 自动释放。 除了 synchronized，还可以用 ReentrantLock 这种显式锁，灵活性更高，比如支持超时、可中断，但代码也更复 杂。像 ConcurrentHashMap 就是用 CAS + synchronized 的组合来兼顾性能和安全。 1）synchronized 是 JVM 层面支持的，编译后会生成 monitorenter 和 monitorelease 指令 2）锁升级过程：无锁 → 偏向锁 → 轻量级锁 → 重量级锁，减少竞争不激烈时的开销 3）锁的是对象，不是代码，多个线程抢同一个对象的锁才会互斥 别忘了 volatile，它不能保证原子性，但能禁止指令重排，适合状态标记场景。
 
 ## 24. Synchronized 能不能禁止指令重排序？
@@ -383,9 +361,9 @@ sleep 和 yield 都是线程让出执行权的方法，但行为完全不同。 
 try {
 Thread.sleep(1000); // 休眠 1 秒
 } catch (InterruptedException e) { Thread.currentThread().interrupt();
+}
 ```
 
-}
 2） Thread.yield() 只是建议当前线程让出 CPU，从运行态回到就绪态，是否生效完全取决于操作系统调度器。 它不保证任何时间的暂停，甚至可能被立刻再次选中。一般很少用，因为效果不可控。JVM 实现上，yield 通常会触发 一次线程调度尝试，但不是阻塞。 关键区别在于：sleep 会让线程阻塞一段时间，yield 只是打个招呼说“我愿意让”。sleep 会释放 CPU 但不释放锁， yield 同样不释放锁，但压根不经过阻塞队列。 实际开发中，sleep 常用于限流、重试间隔等场景，而 yield 基本见不到，除非在极特殊的性能调优场景下尝试减少线 程竞争开销，但效果通常不如直接用并发工具类。
 
 ## 28. 在 Java 中主线程如何知晓创建的子线程是否执行成功？
@@ -441,11 +419,7 @@ volatile 和 synchronized 都能保证多线程下的可见性，但它们的职
 // volatile 使用
 volatile boolean shutdownRequested;
 public void shutdown() { shutdownRequested = true;
-```
-
 }
-
-```
 public void doWork() { while (!shutdownRequested) {
 // 执行任务
 } }
@@ -476,9 +450,9 @@ StampedLock 是 Java 8 引入的一种高性能读写锁，用来替代传统的
 
 ```
 synchronized (lock) { while (queue.isEmpty()) { lock.wait(); } queue.poll(); lock.notify();
+}
 ```
 
-}
 除此之外，JUC 包提供了更高级的工具。比如 CountDownLatch 让一个或多个线程等待其他线程完成操作， CyclicBarrier 实现线程互相等待到达某个屏障点。像 ThreadPoolExecutor 内部就大量使用这些工具协调工作线程。
 
 ## 34. 你了解 Java 线程池的原理吗？
@@ -536,9 +510,9 @@ Java 的 Timer 是一个内置的任务调度工具，用来在指定时间或�
 Timer timer = new Timer(); timer.schedule(new TimerTask() {
 public void run() {
 System.out.println("执行一次");
+}
 ```
 
-}
 }, 1000); // 1秒后执行
 对比来看，Timer 适合轻量、简单的场景，比如定时刷新状态。但真正做业务调度，像订单超时、心跳检测这些，一 般都会选 Quartz 或 Spring 的 @Scheduled ，底层也是基于线程池那套机制。
 
@@ -557,13 +531,11 @@ semaphore.acquire(); // 获取许可
 try {
 // 执行操作
 } finally {
-```
 
-```
 semaphore.release(); // 一定要释放
+}
 ```
 
-}
 漏掉 release 就会导致许可越来越少，最后所有线程都被卡住。所以通常放在 finally 块里确保执行。
 
 ## 42. 什么是 Java 的 CountDownLatch？
@@ -621,17 +593,11 @@ Java 的并发累加器，主要是 LongAdder 和 DoubleAdder ，这玩意儿在
 
 ```
 LongAdder adder = new LongAdder();
-```
 
-```
 adder.increment(); // 线程安全累加
-```
 
-```
 adder.sum();
-```
 
-```
 // 获取总和（可能有延迟）
 ```
 
@@ -659,9 +625,9 @@ synchronized 的底层其实依赖 JVM 对 monitor 的支持，每个对象都�
 ```
 synchronized (obj) {
 // 字节码层面会生成 monitorenter 和 monitorexit 指令 // 对应到 ObjectMonitor 的 enter() 和 exit()
+}
 ```
 
-}
 解锁时要释放 monitor，并唤醒等待的线程。如果多个线程同时竞争，可能触发锁膨胀甚至全局停顿。 整个过程是 JVM 自动管理的，开发者不用干预，这也是为什么叫“内置锁”。
 
 ## 52. 什么是 Java 内存模型（JMM）？
@@ -686,9 +652,9 @@ volatile boolean initialized = false;
 data = 1;
 initialized = true; // 写 volatile // 线程 B if (initialized) { // 读 volatile
 System.out.println(data); // 能安全看到 data = 1
+}
 ```
 
-}
 这套规则其实是 JMM（Java 内存模型）的一部分，编译器和 CPU 的优化都得遵守它，才能让并发编程有据可依。
 
 ## 55. 什么是 Java 中的指令重排？
@@ -722,9 +688,9 @@ executor.setCorePoolSize(20);
 ```
 synchronized (obj) {
 // 多个线程进来抢，有人挂起 // 此处触发锁膨胀后，以后永远是重量级
+}
 ```
 
-}
 所以设计系统时，如果能用 CAS 或 ReentrantLock 控制锁粒度，很多时候更灵活。毕竟 synchronized 的自动升级机 制虽然省心，但一旦上去就下不来了。
 
 ## 58. 你了解时间轮（Time Wheel）吗？有哪些应用场景？
@@ -755,9 +721,7 @@ System.out.println("线程1继续执行");
 }).start();
 Thread.sleep(100);
 System.out.println("主线程准备就绪");
-```
 
-```
 barrier.await();
 System.out.println("主线程继续执行");
 ```
@@ -772,9 +736,9 @@ ReentrantLock 的底层依赖 AQS（AbstractQueuedSynchronizer）来实现线程
 ReentrantLock lock = new ReentrantLock(); lock.lock(); try {
 // 临界区
 } finally { lock.unlock();
+}
 ```
 
-}
 注意必须配合 try-finally 使用，否则容易发生死锁。像 ConcurrentHashMap 或线程池内部任务调度这类高并发场 景，都用到了类似的机制来替代 synchronized，控制更精细。
 
 ## 62. 什么是 Java 的 CompletableFuture？
@@ -785,9 +749,7 @@ Java 里的 CompletableFuture 是为了把异步编程变得更简单而设计�
 CompletableFuture.supplyAsync(() -> {
 // 异步获取用户信息
 return userService.getUser(1);
-```
 
-```
 }).thenApply(user -> user.getName()) .thenAccept(name -> System.out.println("Hello: " + name));
 ```
 
@@ -807,9 +769,7 @@ Java 的 ForkJoinPool 是为分治算法量身打造的线程池，特别适合�
 
 ```
 class SumTask extends RecursiveTask<Long> { private final long[] arr; private final int start, end; private static final int THRESHOLD = 1000;
-```
 
-```
 public Long compute() { if (end - start <= THRESHOLD) { return computeDirectly(); } int mid = (start + end) >>> 1; SumTask left = new SumTask(arr, start, mid); SumTask right = new SumTask(arr, mid, end); left.fork(); return right.compute() + left.join();
 } }
 ```

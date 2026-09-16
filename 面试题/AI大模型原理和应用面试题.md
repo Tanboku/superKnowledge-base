@@ -47,9 +47,7 @@ RAG 的上下文长度是有限的，比如主流模型一般支持 32k 或 128k
 
 ```
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-```
 
-```
 splitter = RecursiveCharacterTextSplitter( chunk_size=512, chunk_overlap=50,
 separators=["\n\n", "\n", "。", " ", ""]
 ) docs = splitter.split_text(large_document)
@@ -81,9 +79,9 @@ MCP 协议并不是一个在 AI 大模型领域广泛通用的标准协议，目
 // 伪代码示意：控制平面接收加载模型指令
 void onReceiveLoadModel(String modelId, String version) { ModelInstance instance = createOrReuseInstance(modelId);
 instance.loadFromStorage(); // 可能涉及 mmap、量化加载等优化 registerToRouter(instance); // 注册到流量路由器
+}
 ```
 
-}
 要不要用这类协议，取决于系统规模。小场景直接 API 调用就够了，上了百个模型实例后，就得靠统一控制平面 来“扛住”运维复杂度了。
 
 ## 10. MCP 架构包含哪些核心组件？
@@ -113,9 +111,9 @@ Spring AI 框架本身是 Spring 生态中用于接入大模型服务的抽象�
 ```
 @Bean ChatClient mcpChatClient(WebClient webClient) {
 return ChatClient.builder() .baseUrl("https://mcp-gateway.example.com") .webClient(webClient) .build();
+}
 ```
 
-}
 实际请求中，header 或 payload 里要带上 MCP 要求的元数据，比如会话 ID、租户上下文等。这类脏活累活一般封装 在拦截器里处理。 如果使用 Spring AI 0.8.0+ 版本，已经支持 SPI 扩展机制，可以更干净地插拔协议实现。不过目前主流厂商如通义千 问、百川都不走 MCP，它更多出现在内部统一推理网关场景，比如阿里云灵积的部分私有实例。
 
 ## 15. MCP 协议安全性设计包含哪些层面？
@@ -190,9 +188,9 @@ GPT Structured Outputs 是一种让大模型输出结构化数据的能力，比
 
 ```
 { "name": "Alice", "age": 30, "city": "Beijing"
+}
 ```
 
-}
 这种机制适合做配置生成、表单填充、API 数据抽取等任务。和以前“靠运气”解析文本不同，现在结果可预测、可验 证。 不过得注意，模型不会自动知道什么时候该输出结构，必须显式设置参数，否则还是走自由生成。另外复杂 schema 可能增加 token 消耗，设计时要权衡清晰度与成本。 如果原题解中的某句话使用了超链接，不要对这句话做任何改动。
 
 ## 23. 什么是 LangChain？
@@ -230,13 +228,9 @@ LangChain 是个工具箱，帮你快速搭起和大模型交互的流水线。�
 
 ```
 from langgraph.graph import StateGraph
-```
 
-```
 graph = StateGraph(MyState) graph.add_node("draft", draft_node) graph.add_node("review", review_node) graph.add_conditional_edges("review", graph.add_edge("draft", "review")
-```
 
-```
 should_rework)
 ```
 
@@ -301,9 +295,9 @@ A2A（Application-to-Application）协议不是某个具体的技术标准，而
 ```
 // 消费方调用远程服务
 ResponseEntity<StockResult> result = restTemplate.getForEntity( "http://stock-service/decrease?itemId=1001", StockResult.class
+);
 ```
 
-);
 但实际落地要考虑超时、重试、熔断这些容错机制，不然一个服务卡住可能拖垮整条链路。Spring Cloud OpenFeign + Hystrix 是一种典型组合。
 
 ## 33. A2A 协议的工作流程是怎样的？
@@ -315,15 +309,14 @@ A2A（Application-to-Application）协议不是某个具体的标准协议，而
 
 大模型的结构化输出，说白了就是让模型不光吐文字，还能按指定格式返回数据，比如 JSON、XML 或特定 schema 的内容。你给个指令，它能生成符合接口契约的响应，而不是一堆自由发挥的自然语言。 这在实际系统集成里特别关键。比如你让大模型从一段文本里抽用户信息，直接回“张三，35岁，北京”还得再解 析，但如果要求结构化输出，它就能直接给你：
 
-{
-
 ```
+{
 "name": "张三",
 "age": 35,
 "city": "北京"
+}
 ```
 
-}
 这种能力一般靠提示词工程（prompt engineering）引导，或者用像 JSON mode 这类机制强制约束输出格式。 OpenAI 的 API 支持 response_format={ "type": "json_object" } ，这时候模型就必须输出合法 JSON，否 则调用方解析要出问题。 更进一步的做法是结合 function calling 或 tool use，把结构化输出当成调用外部工具的中间协议。比如你让模型判 断是否需要查天气，它就返回一个带 function_call 字段的 JSON，里面是函数名和参数，下游系统直接执行。 这类技术减少了后处理成本，让大模型能真正嵌入到软件流程里，而不是只当个聊天玩具。不过对模型本身的推理一 致性和格式遵从度要求更高，小模型容易格式错乱，得反复校验。
 
 ## 35. 什么是 Google ADK？
@@ -388,7 +381,11 @@ ensemble_retriever = EnsembleRetriever( retrievers=[vector_retriever, BM25Retrie
 ```
 
 weights=[0.6, 0.4] # 这里可以动态算出来再传
+
+```
 )
+```
+
 重点是 weights 别写死。你可以先跑个轻量模型预估各路匹配质量，再填进去。像 Jina Reranker、M3E + BGE 组 合在 C-MTEB 上能涨 5~8 个点，比静态融合强不少。
 
 ## 39. 当大模型上下文窗口扩展到100万token时，哪些现有业务场景可能发生质变？
@@ -410,9 +407,8 @@ PDF里的表格数据在RAG里是个硬骨头，因为传统文本切片会把�
 doc = Document(
 page_content=markdown_table, # 结构化后的表格
 metadata={"type": "table", "page": pagenum}
-```
-
 )
+```
 
 整个流程关键在于提前结构化，而不是指望向量模型自己理解破碎的表格文本。很多RAG效果差，其实是数据预处理 没做好这一步。
 
@@ -426,17 +422,11 @@ RAG 里的 Rerank 其实就是对检索阶段召回的多个文档片段，重�
 pairs = [(query, doc) for doc in
 scores = reranker.predict(pairs)
 ranked_docs = [doc for _, doc in
-```
 
-```
 retrieved_docs] sorted(zip(scores,
-```
 
-```
 retrieved_docs),
-```
 
-```
 reverse=True)]
 ```
 
@@ -503,13 +493,9 @@ PEFT 全称是 Parameter-Efficient Fine-Tuning，直白点说就是“只动一�
 
 ```
 from peft import LoraConfig, get_peft_model lora_config = LoraConfig(
-```
 
-```
 r=8, lora_alpha=16, target_modules=["q_proj", lora_dropout=0.1, bias="none", task_type="CAUSAL_LM" ) model = get_peft_model(model,
-```
 
-```
 "v_proj"], lora_config)
 ```
 
@@ -728,14 +714,10 @@ KV Cache 显存占用过大 小 batch 或不规则请求导致 GPU 利用率上�
 
 ```
 from peft import LoraConfig, get_peft_model
-```
 
-```
 lora_config = LoraConfig( r=8, lora_alpha=16, target_modules=["q_proj", lora_dropout=0.1, bias="none", task_type="CAUSAL_LM"
 ) model = get_peft_model(model,
-```
 
-```
 "v_proj"], lora_config)
 ```
 
@@ -747,9 +729,9 @@ lora_config = LoraConfig( r=8, lora_alpha=16, target_modules=["q_proj", lora_dro
 
 ```
 training_args = TrainingArguments( output_dir="output", weight_decay=0.01
+)
 ```
 
-)
 2）Dropout 在微调阶段依然有效。虽然预训练模型内部已经固化了结构，但在分类头甚至最后几层中间加 Dropout， 能让输出不依赖于少数神经元。一般保留率设在 0.1～0.3 就够了。 3）早停（Early Stopping）特别适合微调场景。因为微调轮次少，可能只跑 3～5 个 epoch，验证集性能一旦下降就 终止，能避免多走一两步掉进过拟合坑里。
 
 4）还有像 标签平滑（Label Smoothing）这种软化监督信号的方法。它不让模型对真实标签过于自信，间接抑制过拟 合。在分类任务中设 label_smoothing_factor=0.1 是常见做法。 这些方法本质都是给学习过程加点“不确定性”或“惩罚”，让模型别把微调当背书，稍微收着点劲。

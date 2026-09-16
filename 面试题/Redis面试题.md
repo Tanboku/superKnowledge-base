@@ -47,9 +47,9 @@ Redis 里的 String 类型底层其实用的不是 C 语言原生的 char 数组
 
 ```
 struct sdshdr { int len; int free; char buf[];
+};
 ```
 
-};
 像 Redis 做 RDB 写入或网络传输时，经常要二进制安全地处理数据，SDS 不依赖 \0 结尾，能存任意字节，这也是 比 C 字符串强的地方。
 
 ## 7. 如何使用 Redis 快速实现排行榜？
@@ -271,9 +271,9 @@ Redis 的 Pipeline 是一种批量执行命令的机制，用来减少客户端�
 
 ```
 try (Jedis jedis = new Jedis("localhost")) { Pipeline pipeline = jedis.pipelined(); for (int i = 0; i < 1000; i++) { pipeline.set("key:" + i, "value" + i); pipeline.incr("counter"); } List<Object> results = pipeline.syncAndReturnAll();
+}
 ```
 
-}
 1）命令通过 pipelined() 获取管道对象后，调用不会立即执行 2）实际是把命令缓存在本地队列里 3）syncAndReturnAll() 才真正发送并等待所有回复
 
 ## 36. Redis 中的 Big Key 问题是什么？如何解决？
@@ -305,9 +305,9 @@ pid = fork(); if (pid == 0) {
 // 子进程执行 rdbSave()
 } else {
 // 父进程继续跑 event loop
+}
 ```
 
-}
 整个过程父进程基本不阻塞，除非 fork 那一瞬间要拷贝页表，数据量特别大时可能卡几十毫秒。其他时候请求压根不 经过 RDB 流程，该读读该写写。
 
 ## 40. Redis 的哨兵机制是什么？
@@ -365,9 +365,7 @@ PUBLISH chat_room "Hello!"
 if redis.call("get", KEYS[1]) == ARGV[1] return redis.call("del", KEYS[1])
 else return 0
 end
-```
 
-```
 then
 ```
 
@@ -410,9 +408,9 @@ lock.lock(30, TimeUnit.SECONDS); // 自动续期
 try {
 // 执行业务逻辑
 } finally { lock.unlock();
+}
 ```
 
-}
 其实关键不是锁本身，而是你要清楚：业务执行时间和锁过期时间压根不匹配的时候，光靠延长过期时间搞不定。得 从整体流程设计上去应对，比如拆任务、加状态、做补偿。
 
 ## 52. Redis 中跳表的实现原理是什么？
@@ -422,41 +420,28 @@ try {
 ```
 // 简化版 zskiplistNode 结构
 typedef struct zskiplistNode
-```
 
-```
 sds ele;
-```
 
 //
 
-```
 double score;
-```
 
 //
 
-```
 struct zskiplistLevel {
-```
 
-```
 struct zskiplistNode
-```
 
-```
 unsigned int span;
-```
 
-```
 } level[];
-```
 
-```
 } zskiplistNode;
-```
 
 {
+```
+
 成员值 分值，排序依据
 
 ```

@@ -92,17 +92,11 @@ TCP 和 UDP 的本质区别在于，一个追求可靠交付，一个追求极�
 // UDP 发送片段
 DatagramSocket socket = new DatagramSocket(); byte[] data = "hello".getBytes(); InetAddress addr = InetAddress.getByName("127.0.0.1"); DatagramPacket packet = new DatagramPacket(data, data.length,
 socket.send(packet); // 扔出去就不管了
-```
 
-```
 addr,
-```
 
-```
 8080);
-```
 
-```
 // TCP 发送片段
 Socket socket = new Socket("127.0.0.1", 8080); OutputStream out = socket.getOutputStream();
 ```
@@ -163,9 +157,9 @@ ORDER BY ${columnName}
 
 ```
 public class ParserFactory { public static Parser create(String type) { if ("json".equals(type)) return new JsonParser(); if ("xml".equals(type)) return new XmlParser(); throw new IllegalArgumentException("Unknown type"); }
+}
 ```
 
-}
 说白了，它就是个封装了 new 的工具类，让调用方更干净，但扩展性有限。真要搞灵活，还是得上 工厂方法模式 或 抽象工厂。
 
 ## 20. 什么是观察者模式？一般用在什么场景？
@@ -176,18 +170,10 @@ public class ParserFactory { public static Parser create(String type) { if ("jso
 
 ```
 interface Observer { void update(String message);
-```
-
 }
-
-```
 class Subject { private List<Observer> observers = new ArrayList<>(); private String state;
 public void setState(String state) { this.state = state; notifyObservers();
-```
-
 }
-
-```
 private void notifyObservers() { observers.forEach(o -> o.update(state));
 } }
 ```
@@ -204,9 +190,9 @@ abstract void validate(); abstract void process();
 void log() { System.out.println("default log"); } }
 class MyProcess extends ProcessTemplate {
 void validate() { /* 自定义校验 */ } void process() { /* 业务处理 */ }
+}
 ```
 
-}
 适合用在多个子类有相同工作流程，只是细节不同的场景。要是每个子类流程都不一样，硬套模板反而更麻烦。
 
 ## 22. 什么是策略模式？一般用在什么场景？
@@ -215,18 +201,10 @@ void validate() { /* 自定义校验 */ } void process() { /* 业务处理 */ }
 
 ```
 public interface Strategy { void execute();
-```
-
 }
-
-```
 public class Context { private Strategy strategy;
 public void setStrategy(Strategy strategy) { this.strategy = strategy;
-```
-
 }
-
-```
 public void run() { strategy.execute();
 } }
 ```
@@ -243,11 +221,8 @@ public abstract class Handler { protected Handler next; public void setNext(Hand
 public void handle(Request request) { if (request.getType() == "type1") {
 System.out.println("Level1 处理");
 } else if (next != null) { next.handle(request);
-```
-
 }
 
-```
 } }
 ```
 
@@ -334,9 +309,9 @@ HashMap 的容量设计成 2 的 n 次方，主要是为了快速计算元素的
 
 ```
 public HashMap() { this.loadFactor = 0.75f;
+}
 ```
 
-}
 实际开发中，如果你知道数据量会很大且稳定，可以提前算好容量，避免频繁 rehash。比如要存 1000 个元素，按 0.75 算，初始容量至少设成 1000 / 0.75 ≈ 1333 ，再向上取最接近的 2 的幂，也就是 2048。
 
 ## 31. 为什么 JDK 1.8 对 HashMap 进行了红黑树的改动？
@@ -632,17 +607,11 @@ age int, city varchar(20) );
 
 ```
 ALTER TABLE users ADD INDEX
-```
 
-```
 idx_name_age
-```
 
-```
 (name,
-```
 
-```
 age);
 ```
 
@@ -726,9 +695,7 @@ SELECT * FROM orders WHERE
 
 ```
 CREATE INDEX idx_user_time
-```
 
-```
 user_id = 123 AND create_time > '2023-01-01'; ON orders(user_id, create_time);
 ```
 
@@ -805,9 +772,7 @@ Redis 的 Lua 脚本让你能把一组操作打包成一个原子执行的脚本
 
 ```
 local num = redis.call('GET', KEYS[1]) if not num then return 0 end
-```
 
-```
 if tonumber(num) >= tonumber(ARGV[1]) then return redis.call('DECRBY', KEYS[1], ARGV[1])
 else return -1
 end
@@ -821,9 +786,9 @@ Redis 的 Pipeline 是一种批量执行命令的机制，用来减少客户端�
 
 ```
 try (Jedis jedis = new Jedis("localhost")) { Pipeline pipeline = jedis.pipelined(); for (int i = 0; i < 1000; i++) { pipeline.set("key:" + i, "value" + i); pipeline.incr("counter"); } List<Object> results = pipeline.syncAndReturnAll();
+}
 ```
 
-}
 1）命令通过 pipelined() 获取管道对象后，调用不会立即执行 2）实际是把命令缓存在本地队列里 3）syncAndReturnAll() 才真正发送并等待所有回复
 
 ## 94. Redis 中的 Big Key 问题是什么？如何解决？
@@ -860,9 +825,9 @@ pid = fork(); if (pid == 0) {
 // 子进程执行 rdbSave()
 } else {
 // 父进程继续跑 event loop
+}
 ```
 
-}
 整个过程父进程基本不阻塞，除非 fork 那一瞬间要拷贝页表，数据量特别大时可能卡几十毫秒。其他时候请求压根不 经过 RDB 流程，该读读该写写。
 
 ## 98. Redis 的哨兵机制是什么？
@@ -904,9 +869,7 @@ Redis 集群在特定网络分区场景下，确实可能出现类似脑裂的�
 if redis.call("get", KEYS[1]) == ARGV[1] return redis.call("del", KEYS[1])
 else return 0
 end
-```
 
-```
 then
 ```
 
@@ -1037,9 +1000,7 @@ Spring Boot 启动 Web 项目不是靠 main 方法本身多高级，而是靠 Sp
 
 ```
 @SpringBootApplication public class App {
-```
 
-```
 public static void main(String[] args) { SpringApplication.run(App.class, args);
 } }
 ```
@@ -1054,9 +1015,7 @@ Spring 启动过程本质是 IoC 容器的初始化和刷新，核心入口在 r
 public void refresh() { prepareRefresh(); ConfigurableListableBeanFactory beanFactory = prepareBeanFactory(beanFactory); postProcessBeanFactory(beanFactory); invokeBeanFactoryPostProcessors(beanFactory); registerBeanPostProcessors(beanFactory); initMessageSource(); initApplicationEventMulticaster();
 onRefresh(); // 如 Web 容器启动
 registerListeners(); finishBeanFactoryInitialization(beanFactory); finishRefresh(); }
-```
 
-```
 obtainFreshBeanFactory();
 ```
 
@@ -1102,9 +1061,9 @@ HTTP 是应用层协议，本质是通信规范，而 RPC 是一种编程模型�
 return remoteCallToRecommendService(); }
 public List<Item> getDefaultRecommend() {
 return Collections.emptyList(); // 降级返回空列表
+}
 ```
 
-}
 要不要降级、降哪一块，得从业务角度权衡。核心原则就一条：保最重要的那个动作能跑通。
 
 ## 132. 什么是服务熔断？
@@ -1147,9 +1106,7 @@ MyBatis 和 Hibernate 都是 Java 里处理数据库操作的 ORM 框架，但�
 
 ```
 public class Singleton { private static final Singleton INSTANCE = new Singleton(); private Singleton() {} public static Singleton getInstance() { return INSTANCE;
-```
 
-```
 } }
 ```
 
@@ -1157,16 +1114,16 @@ public class Singleton { private static final Singleton INSTANCE = new Singleton
 
 ```
 public class Singleton { private Singleton() {} private static class Holder { static final Singleton INSTANCE = new Singleton(); } public static Singleton getInstance() { return Holder.INSTANCE; }
+}
 ```
 
-}
 5）枚举单例最简洁安全，不仅能防反射攻击，还能防止序列化破坏单例，Effective Java 推荐的方式。
 
 ```
 public enum Singleton { INSTANCE;
+}
 ```
 
-}
 一般项目里用静态内部类或枚举就够了。DCL 虽高效但容易写错，比如漏掉 volatile。如果涉及到反序列化或反射的场 景，优先选枚举。
 
 ## 138. 工厂模式和抽象工厂模式有什么区别？
@@ -1175,9 +1132,9 @@ public enum Singleton { INSTANCE;
 
 ```
 public class ConnectionFactory { public Connection getConnection(String type) { if ("mysql".equals(type)) return new MySQLConnection(); if ("pg".equals(type)) return new PostgreSQLConnection(); throw new IllegalArgumentException(); }
+}
 ```
 
-}
 抽象工厂模式处理的是多个产品族的创建，强调产品之间的协调性。比如你有 MySQL + Redis 组合、PostgreSQL + Memcached 组合，每个组合是一套数据访问层方案。抽象工厂定义一套创建接口，每种实现负责创建一整套配套的 对象。
 
 ```
@@ -1282,17 +1239,11 @@ rabbitTemplate.setReturnCallback((message,
 routingKey) -> {
 // 处理退回的消息，比如发告警或存 DB
 });
-```
 
-```
 replyCode,
-```
 
-```
 replyText,
-```
 
-```
 exchange,
 ```
 
@@ -1306,9 +1257,7 @@ exchange,
 
 ```
 Map<String, Object> args = new HashMap<>(); args.put("x-dead-letter-exchange", "dlx.exchange"); args.put("x-dead-letter-routing-key", "dead"); channel.queueDeclare("normal.queue", true, false, false,
-```
 
-```
 args);
 ```
 
@@ -1319,9 +1268,9 @@ args);
 
 ```
 public enum Singleton { INSTANCE; public void doSomething() { /*...*/ }
+}
 ```
 
-}
 观察者模式定义了一对多的依赖关系，主题变化时通知所有观察者自动更新。典型场景是事件驱动系统，比如 Spring 的 ApplicationEvent 机制，监听 ContextRefreshedEvent 做初始化动作。 代理模式在不改变原始类接口的前提下增强功能。静态代理手动写，动态代理可以用 JDK 原生（基于接口）或 CGLIB （基于继承）。Spring AOP 默认用 JDK 动态代理，除非目标类没有接口才退化到 CGLIB。 模板方法模式把算法骨架固定在父类，把可变步骤延迟到子类实现。像 Java 中的 AbstractExecutorService.submit() 就是模板，真正执行交给具体线程池策略。 这几个模式在框架里到处都是，MyBatis 用工厂造 SqlSession，Spring 大量使用代理和观察者，理解它们等于看懂了 框架的筋骨。
 说说你知道的几种 I/O 模型
 
@@ -1336,9 +1285,7 @@ Netty 本质是个高性能的网络编程框架，把 NIO 那套复杂的 API �
 EventLoopGroup boss = new NioEventLoopGroup(1); EventLoopGroup worker = new NioEventLoopGroup(); ServerBootstrap b = new ServerBootstrap(); b.group(boss, worker)
 .channel(NioServerSocketChannel.class) .childHandler(new ChannelInitializer<SocketChannel>() {
 public void initChannel(SocketChannel ch) {
-```
 
-```
 ch.pipeline().addLast(new SimpleChannelInboundHandler<ByteBuf>() { protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
 // 处理读取数据
 } }); } }); b.bind(8080).sync();
@@ -1403,12 +1350,9 @@ hasScheduledTasks()) {
 if (selectedCnt >= SELECTOR_AUTO_REBUILD_THRESHOLD)
 rebuildSelector(); // 重建
 return;
-```
-
 }
 }
 
-```
 hasTasks() ||
 ```
 
@@ -1466,9 +1410,9 @@ Spring Boot 启动看起来就一行 run() 调用，背后其实做了不少事�
 
 ```
 public static void main(String[] args) { SpringApplication.run(Application.class, args);
+}
 ```
 
-}
 但你知道它背后把自动配置、条件装配、内嵌容器这些脏活累活全包了，才让你能一键启动。
 
 ## 170. MySQL 事务的二阶段提交是什么？
@@ -1495,9 +1439,9 @@ JVM 产生 OOM 的情况主要集中在几个内存区域，每个区域的溢�
 // 直接内存溢出模拟
 for (;;) {
 ByteBuffer.allocateDirect(1024 * 1024); // 每次分配 1MB
+}
 ```
 
-}
 这类问题线上排查得看 OutOfMemoryError 后面的提示，比如 "Java heap space"、"Metaspace"、"Direct buffer memory" 都能直接定位区域。
 
 ## 174. Java 的 synchronized 是怎么实现的？
@@ -1507,9 +1451,9 @@ synchronized 的底层其实依赖 JVM 对 monitor 的支持，每个对象都�
 ```
 synchronized (obj) {
 // 字节码层面会生成 monitorenter 和 monitorexit 指令 // 对应到 ObjectMonitor 的 enter() 和 exit()
+}
 ```
 
-}
 解锁时要释放 monitor，并唤醒等待的线程。如果多个线程同时竞争，可能触发锁膨胀甚至全局停顿。 整个过程是 JVM 自动管理的，开发者不用干预，这也是为什么叫“内置锁”。
 
 ## 175. 什么是 Java 内存模型（JMM）？
@@ -1554,41 +1498,28 @@ MVCC，全称多版本并发控制，是 MySQL InnoDB 存储引擎实现高并�
 ```
 // 简化版 zskiplistNode 结构
 typedef struct zskiplistNode
-```
 
-```
 sds ele;
-```
 
 //
 
-```
 double score;
-```
 
 //
 
-```
 struct zskiplistLevel {
-```
 
-```
 struct zskiplistNode
-```
 
-```
 unsigned int span;
-```
 
-```
 } level[];
-```
 
-```
 } zskiplistNode;
-```
 
 {
+```
+
 成员值 分值，排序依据
 
 ```
@@ -1710,10 +1641,7 @@ executor.setCorePoolSize(20);
 ```
 stmt.setFetchSize(Integer.MIN_VALUE); // MySQL 游标式读取
 ResultSet rs = stmt.executeQuery("SELECT * FROM big_table"); while (rs.next()) {
-```
 
-```
 // 流式处理，内存不爆炸
-```
-
 }
+```

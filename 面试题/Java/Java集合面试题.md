@@ -52,9 +52,9 @@ ArrayList 的扩容发生在添加元素时容量不足的情况下，整个过�
 
 ```
 private void grow() { int oldCapacity = elementData.length; int newCapacity = oldCapacity + (oldCapacity >> 1); elementData = Arrays.copyOf(elementData, newCapacity);
+}
 ```
 
-}
 频繁扩容会影响性能，因为每次都要内存分配和数组拷贝。如果能预估数据量，建议初始化时直接指定容量，比如 new ArrayList<>(1000) ，这样能避免中间多次扩容的开销。 扩容本身是脏活累活，但对上层透明。你只管 add，它自动帮你扛住容量问题，前提是别在循环里无脑 add 大量数据 而不预设容量。
 
 ## 6. 什么是 Hash 碰撞？怎么解决哈希碰撞？
@@ -68,9 +68,8 @@ int i = (n - 1) & hash; // 定位桶
 if (tab[i] == null || (e = tab[i]) == null) { tab[i] = newNode(hash, key, value, null);
 } else {
 // 碰撞了，遍历链表或树插入
-```
-
 }
+```
 
 一般来说，链地址法更灵活，适合冲突较多的场景；开放寻址法内存紧凑，但负载高时性能下降明显。选哪种得看具 体需求和数据特征。
 Java 中有哪些集合类？请简单介绍
@@ -126,9 +125,7 @@ it.remove(); // 正确姿势，内部会同步
 
 ```
 } }
-```
 
-```
 modCount
 ```
 
@@ -140,9 +137,9 @@ CopyOnWriteArrayList 是个典型的读写分离数据结构，主要用在读�
 
 ```
 public boolean add(E e) { synchronized (lock) { Object[] elements = getArray(); int len = elements.length; Object[] newElements = Arrays.copyOf(elements, len + 1); newElements[len] = e; setArray(newElements); } return true;
+}
 ```
 
-}
 写操作的锁只用来保抷新数组的构建和替换，时间窗口小，但依然比普通 ArrayList 慢一个量级。
 
 ## 12. 为什么 Java 的 ConcurrentHashMap 不支持 key 或 value 为 null？
@@ -163,33 +160,21 @@ ConcurrentHashMap 的 get 方法不需要加锁，这是它和 Hashtable 最关�
 
 ```
 transient volatile Node<K,V>[] table;
-```
 
-```
 static class Node<K,V> implements Map.Entry<K,V> {
-```
 
-```
 final int hash;
-```
 
-```
 final K key;
-```
 
-```
 volatile V val;
-```
 
-```
 // 注意是 volatile
-```
 
-```
 volatile Node<K,V> next; // 也是 volatile
-```
 
 }
+```
 
 ## 14. Java 中 ConcurrentHashMap 1.7 和 1.8 之间有哪些区别？
 
@@ -230,9 +215,9 @@ Map<String, Integer> map = new LinkedHashMap<>(); map.put("first", 1); map.put("
 
 ```
 protected boolean removeEldestEntry(Map.Entry eldest) { return size() > MAX_SIZE;
+}
 ```
 
-}
 这时候超过容量会自动淘汰最老的数据。注意初始容量和负载因子别设得太小，不然频繁扩容影响性能。 它的缺点是内存占用比 HashMap 稍高，因为要存前后指针。但大多数场景下这点开销不值一提。
 
 ## 18. JDK 1.8 对 HashMap 除了红黑树还进行了哪些改动？
@@ -254,9 +239,9 @@ HashMap 的设计目标是在平均情况下实现 O(1) 的存取效率。0.75 �
 
 ```
 public HashMap() { this.loadFactor = 0.75f;
+}
 ```
 
-}
 实际开发中，如果你知道数据量会很大且稳定，可以提前算好容量，避免频繁 rehash。比如要存 1000 个元素，按 0.75 算，初始容量至少设成 1000 / 0.75 ≈ 1333 ，再向上取最接近的 2 的幂，也就是 2048。
 
 ## 21. 为什么 HashMap 在 Java 中扩容时采用 2 的 n 次方倍？

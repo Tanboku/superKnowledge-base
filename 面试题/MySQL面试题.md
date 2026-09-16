@@ -91,9 +91,9 @@ MySQL 的 InnoDB 存储引擎在处理事务时，不会每次写操作都直接
 ```
 CREATE TABLE orders ( id BIGINT PRIMARY KEY,
 amount DECIMAL(10,2) NOT NULL COMMENT '订单金额，单位：元'
+);
 ```
 
-);
 有人说用 int 存“分”也行，比如 100 元存成 10000 分。这确实能避免小数，但你要在代码里反复转换单位，逻辑容 易出错，读数据库也不直观。除非你整个系统都统一这么干，不然没必要。 总之，别碰 float/double。该用 DECIMAL 的地方就得用它，简单直接，不给问题留机会。
 
 ## 13. MySQL 中 INNER JOIN、LEFT JOIN 和 RIGHT JOIN 的区别是什么？
@@ -137,9 +137,9 @@ DATETIME 和 TIMESTAMP 都用来存时间，但底层设计目标不一样，用
 
 ```
 CREATE TABLE events ( id INT PRIMARY KEY, dt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 ```
 
-);
 一般建议：需要跨时区保存时间（比如日志时间、交易发生时间），选 TIMESTAMP；单纯记录某个时刻且不想被时区 干扰，比如“预约时间”，就用 DATETIME。别让 2038 年问题搞不定未来系统。
 
 ## 16. 在 MySQL 中，你使用过哪些函数？
@@ -227,9 +227,9 @@ MySQL 的 TEXT 类型不是单一类型，而是一组用于存储大文本的�
 
 ```
 CREATE TABLE articles ( id INT PRIMARY KEY, content LONGTEXT
+);
 ```
 
-);
 一般选哪种，得看业务数据量级。存个用户简介用 TEXT 绰绰有余，存小说章节建议 MEDIUMTEXT，搞文档归档系统 可能就得上 LONGTEXT。
 
 ## 29. MySQL 中 AUTO_INCREMENT 列达到最大值时会发生什么？
@@ -258,17 +258,11 @@ FETCH NEXT FROM emp_cursor INTO @id,
 
 ```
 CLOSE emp_cursor;
-```
 
-```
 id, name @name;
-```
 
-```
 FROM
-```
 
-```
 employees;
 ```
 
@@ -304,9 +298,7 @@ WAL 的核心思路是：在修改数据前，先确保修改操作的日志落�
 // 伪代码示意 WAL 流程
 write_log_to_buffer(log); fsync_log_file();
 apply_change_to_data_page();
-```
 
-```
 // 写日志到内存 // 日志落盘（关键步骤） // 数据页可以晚点刷
 ```
 
@@ -442,17 +434,11 @@ city varchar(20) );
 
 ```
 ALTER TABLE users ADD INDEX
-```
 
-```
 idx_name_age
-```
 
-```
 (name,
-```
 
-```
 age);
 ```
 
@@ -581,13 +567,9 @@ MySQL 的主从同步本质是数据变更事件的传递与回放。主库把�
 ```
 dataSources: master: ds-master slave_0: ds-slave-0 slave_1: ds-slave-1
 rules: - !READWRITE_SPLITTING dataSources: rw_ds: writeDataSourceName: readDataSourceNames:
-```
 
-```
 master [slave_0,
-```
 
-```
 slave_1]
 ```
 
@@ -614,9 +596,7 @@ SELECT * FROM orders WHERE
 
 ```
 CREATE INDEX idx_user_time
-```
 
-```
 user_id = 123 AND create_time > '2023-01-01'; ON orders(user_id, create_time);
 ```
 

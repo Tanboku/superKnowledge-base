@@ -14,9 +14,7 @@
 ```
 @Service public class MySQLDataService implements DataService { }
 @Service
-```
 
-```
 @Primary public class MongoDataService implements DataService { }
 ```
 
@@ -38,9 +36,9 @@ public void save(User user) { /* ... */ } }
 @Service public class UserService {
 @Autowired private UserDAO dao;
 // 业务方法上加 @Transactional 更自然
+}
 ```
 
-}
 说白了，除了 @Repository 有异常翻译这层实际功能外，其他三个主要是为了分层清晰、便于维护和切面匹配。不用 错就行，别混着用。
 
 ## 5. @Bean和@Component有什么区别？
@@ -76,9 +74,7 @@ RedisTemplate<String, Object> template = new RedisTemplate<>(); template.setConn
 ```
 @ModelAttribute public void populateStates(Model
 model.addAttribute("states", }
-```
 
-```
 model) { stateService.getStates());
 ```
 
@@ -89,9 +85,7 @@ model) { stateService.getStates());
 public String saveUser(@ModelAttribute User user) {
 // user 已经由请求参数自动填充
 userService.save(user);
-```
 
-```
 return "redirect:/users"; }
 ```
 
@@ -131,11 +125,7 @@ Spring 的 @Async 注解失效，最常见的就是方法内部调用导致 AOP 
 @Service public class AsyncTaskService {
 @Async
 public void sendEmail() { /* 异步发邮件 */ }
-```
-
 }
-
-```
 @Service public class UserService {
 @Autowired private AsyncTaskService taskService;
 public void register() {
@@ -151,7 +141,11 @@ public void register() {
 ```
 
 self.sendEmail(); // 通过代理调自己
+
+```
 }
+```
+
 4） 方案三：用 ApplicationContext 拿代理对象，或者 AopContext.currentProxy() ，但得配置 expose-proxy="true" ，代码侵入性强，一般不推荐。
 
 其实最稳妥的还是设计上避免自调用，把异步逻辑下沉到独立组件。像定时任务用 @Scheduled 、事件驱动用 Spring Event，都比硬怼 @Async 更可控。
@@ -177,28 +171,20 @@ return new HikariDataSource(); // 本地用轻量数据库
 @Service public class AsyncTaskService {
 @Async public void sendEmail() {
 System.out.println("当前线程：" + Thread.currentThread().getName());
-```
-
 }
 
 }
 
-```
 @Service public class BusinessService
 @Autowired private AsyncTaskService
-```
 
-```
 { taskService;
-```
 
-```
 public void process() {
 taskService.sendEmail(); // 正确：通过代理调用
+}
+}
 ```
-
-}
-}
 
 错误用法就是把 taskService 的调用换成 this.sendEmail()。
 
@@ -254,9 +240,9 @@ executor.shutdown(); }
 ```
 @PostMapping("/user") public void createUser(@RequestBody User user) {
 // user 已经是解析好的对象了
+}
 ```
 
-}
 反过来， @ResponseBody 是把方法返回的 Java 对象序列化成 JSON，写进 HTTP 响应体里。浏览器收到的就是标 准的 JSON 数据。现在大多数接口都是前后端分离的 REST API，这个注解几乎是标配。
 
 ```
@@ -280,9 +266,7 @@ return "Order ID: " + id; }
 ```
 @GetMapping("/categories/{cid}/products/{pid}") public String getProduct(@PathVariable("cid") String
 @PathVariable("pid") String return "Category " + categoryId + ", Product " + }
-```
 
-```
 categoryId, productId) { productId;
 ```
 
@@ -308,52 +292,36 @@ if (tagName == null) return "All tags"; return "Tag: " + tagName; }
 
 ```
 public class MyInterceptor implements HandlerInterceptor { @Override
-```
 
-```
 public boolean preHandle(HttpServletRequest response, Object handler) {
 System.out.println("执行前");
 return true;
-```
-
 }
 
-```
 request,
-```
 
-```
 HttpServletResponse
-```
 
-```
 @Override
 public void postHandle(HttpServletRequest request,
 Object handler, ModelAndView modelAndView) {
 ```
 
 System.out.println("执行后，视图渲染前");
+
+```
 }
 
-```
 HttpServletResponse
-```
 
-```
 response,
-```
 
-```
 @Override public void afterCompletion(HttpServletRequest response, Object handler, Exception ex) {
 System.out.println("请求完成");
 } }
-```
 
-```
 request,
-```
 
-```
 HttpServletResponse
 ```
 
@@ -366,9 +334,9 @@ HttpServletResponse
 ```
 @ExceptionHandler(IllegalArgumentException.class) public ResponseEntity<String> handleIllegalArgument() {
 return ResponseEntity.badRequest().body("参数不对");
+}
 ```
 
-}
 这样前端调用时传了非法参数，就不会直接返回 500，而是得到一个友好的 400 响应。 2）但更实用的做法是结合 @ControllerAdvice 把异常处理做成全局的。把通用的异常捕获逻辑抽出去，所有 Controller 都能生效，避免每个类都重复写。 3）它支持的返回类型很灵活，可以直接返回 Model 和 View 用于渲染错误页，也可以返回 ResponseEntity 构造 JSON 响应，适合前后端分离场景。 注意它只能捕获当前 Controller 或其调用链中抛出的异常。如果请求压根没进到 Controller，比如被拦截器拦住了， 那它就搞不定了。这类全局性问题得靠 @ControllerAdvice + @ExceptionHandler 配合解决。
 
 ## 20. Spring 中的 @ResponseStatus 注解的作用是什么？
@@ -397,9 +365,7 @@ return "Encoding: " + encoding; }
 @RequestHeader(value = "X-User-ID", required = false) String userId
 2） @CookieValue 是专门取 Cookie 的。比如读取 JSESSIONID：
 @GetMapping("/hello") public String hello(@CookieValue("JSESSIONID") String jSessionId) {
-```
 
-```
 return "Session ID: " + jSessionId; }
 ```
 
@@ -428,14 +394,12 @@ BindingResult result) { if (result.hasErrors()) {
 ```
 
 return "form-page"; // 返回页面，带上错误
-}
 
 ```
+}
 // 处理逻辑
 return "success"; }
-```
 
-```
 form,
 ```
 
@@ -448,9 +412,9 @@ form,
 ```
 @Scheduled(fixedRate = 5000) public void report() {
 System.out.println("执行中...");
+}
 ```
 
-}
 2） 支持多种表达式类型，最常用的是 cron 表达式，比如每天凌晨 1 点执行：
 
 ```
@@ -501,9 +465,7 @@ return new ExpensiveService(); }
 ```
 @PropertySource("classpath:jdbc.properties") @Configuration public class JdbcConfig {
 @Value("${db.url}")
-```
 
-```
 private String dbUrl; }
 ```
 
@@ -526,9 +488,9 @@ Spring 的 @EventListener 注解用来监听应用中发布的事件，相当于
 ```
 @EventListener public void sendWelcomeEmail(UserRegisteredEvent event) {
 // 发送邮件逻辑
+}
 ```
 
-}
 2）监听的事件类型由方法参数决定。如果参数是 ApplicationEvent 子类，那这个方法就只响应这个类型的事 件。支持泛型和条件表达式，比如用 condition = "#event.userType == 'VIP'" 控制只处理特定场景。
 
 3）默认是同步执行的，也就是说发布事件的地方会阻塞，直到所有监听器处理完。如果想异步执行，结合 @Async 一起用就行，但得提前启用 Spring 的异步支持。 4）事件发布靠 ApplicationEventPublisher ，一般通过注入它来发事件。整个机制基于观察者模式，典型的解 耦手段，像 Spring Boot 的内置事件（如 ContextRefreshedEvent ）也是这么玩的。 适合做业务逻辑解耦，比如订单创建后扣库存、更新积分这些不直接影响主流程的操作。不过别滥用，太多链式事件 会让流程难以追踪，调试起来头疼。
@@ -549,9 +511,9 @@ Spring WebFlux 是 Spring 5 引入的响应式编程框架，用来构建异步�
 ```
 @GetMapping("/async") public Mono<String> getData() {
 return service.getDataAsync(); // 非阻塞调用
+}
 ```
 
-}
 3）适用场景有差异 如果业务逻辑简单、依赖少，用 MVC 更稳更熟。但如果你在做网关类服务，比如集成 Spring Cloud Gateway，或者
 
 需要长连接支持（如 WebSocket、SSE），WebFlux 能扛住更高并发。 4）容器支持也不同 MVC 可以跑在任何 Servlet 容器上。WebFlux 要么用 Netty，要么用支持异步 Servlet 3.1+ 的容器（如 Undertow）， Tomcat 虽然也能跑，但优势不如在 Netty 上明显。 要不要上 WebFlux，关键看你的瓶颈是不是在 I/O。如果是 CPU 密集型，两者差别不大。而且响应式栈对数据库驱动 也有要求，像 R2DBC 才能真正实现全链路异步，传统 JDBC 会把整个链路堵死。
@@ -574,9 +536,7 @@ Spring MVC里的Controller本质是处理HTTP请求的入口，它负责接收�
 ```
 @Controller @RequestMapping("/user") public class UserController {
 @GetMapping("/{id}")
-```
 
-```
 public ResponseEntity<User> getUser(@PathVariable Long id) { User user = userService.findById(id); return ResponseEntity.ok(user);
 } }
 ```
@@ -638,9 +598,7 @@ Spring 拦截链的实现其实靠的是 AOP 里的责任链模式，把一堆 H
 public class AuthInterceptor implements HandlerInterceptor { public boolean preHandle(HttpServletRequest req, HttpServletResponse
 Object handler) { if (noAuth(req)) { resp.setStatus(401); return false; } return true;
 } }
-```
 
-```
 resp,
 ```
 
@@ -684,9 +642,9 @@ Spring 的 ObjectFactory 是个简单的工厂接口，核心就一个 getObject
 ```
 @Autowired private ObjectFactory<MyService> myServiceFactory;
 public void useService() { MyService service = myServiceFactory.getObject(); service.doSomething();
+}
 ```
 
-}
 1）每次调 getObject() 都会触发 Bean 的创建流程 2）适用于需要动态获取、避免提前初始化的场景 3）和作用域管理强相关，尤其是 prototype 和 request 这种非单例
 
 ## 49. Spring 中的 FactoryBean 是什么？
@@ -695,9 +653,7 @@ FactoryBean 是 Spring 里一个特殊的接口，它不是用来直接注册普
 
 ```
 public class DataSourceFactoryBean implements FactoryBean<DataSource> { public DataSource getObject() throws Exception {
-```
 
-```
 return createPooledDataSource(); // 复杂创建逻辑
 } public Class<?> getObjectType() {
 return DataSource.class; } }
@@ -745,7 +701,11 @@ Spring IOC 的本质是把对象的创建和依赖管理交给容器来处理，
 ```
 
 private UserDao userDao; // 容器自动注入，压根不经过开发者手动创建
+
+```
 }
+```
+
 这种模式在大型系统里特别关键。像微服务架构中，用 Spring Cloud 搭的服务，Bean 之间跨模块调用频繁，靠手动 维护依赖根本搞不定。IOC 让整个结构变得灵活又可控。
 
 ## 54. 什么是 Spring IOC？
@@ -836,9 +796,9 @@ Spring 的事务传播行为决定了多个事务方法相互调用时，事务�
 ```
 @Transactional(propagation = Propagation.REQUIRES_NEW) public void logRecord() {
 // 即使外部有事务，这里也会另起炉灶
+}
 ```
 
-}
 搞不定传播行为，经常会导致数据不一致。比如该隔离的操作被回滚波及，或者该一起提交的反而拆开了。实际开发 中，像订单创建过程中扣库存和发券，就得保证在同一个事务里，这时候 REQUIRED 就很关键。而做分布式任务调度 时，状态更新要独立提交，就得上 REQUIRES_NEW。
 Spring 的优点
 核心是解耦和扩展 Spring 搞的不是从 0 到 1 写功能，而是让已有代码之间别互相咬死。比如业务代码不用自己 new 数据库连接，而是由 Spring 把依赖“塞”进去，这就是 控制反转（IoC）。你只管写逻辑，创建和组装对象的事交给容器。 依赖注入让单元测试也轻松了。Mock 一个服务直接塞进去就行，不用启动整个应用。 AOP 做横切关注点 日志、事务、权限这些逻辑，散在各处会很乱。Spring 的 AOP 能把这些脏活累活抽出来，在方法执行前后动态织入。 像用 @Transactional 注解的方法，自动套上事务 begin/commit/rollback，底层靠的是动态代理。 生态全，集成简单 你想接 Redis？加个 spring-boot-starter-data-redis 就行。要监控？spring-boot-actuator 开箱即用。它把主流中间 件都包了层，配置几行 yaml 就跑起来。像 Kafka、RabbitMQ、Elasticsearch，基本没有对接不了的。 容器环境友好 Spring Boot 打出来的 jar 包自带 Tomcat，java -jar 直接运行，适合 Docker 部署。启动参数、环境隔离通过 application.yml 分 profile 管理，K8s 里配个 configmap 就能切配置。 1） IoC 容器管理对象生命周期 2） AOP 解决横向逻辑复用 3） 自动装配大幅降低配置成本 4） 和云原生技术栈无缝衔接
@@ -900,9 +860,7 @@ Spring 启动过程本质是 IoC 容器的初始化和刷新，核心入口在 r
 public void refresh() { prepareRefresh(); ConfigurableListableBeanFactory beanFactory = prepareBeanFactory(beanFactory); postProcessBeanFactory(beanFactory); invokeBeanFactoryPostProcessors(beanFactory); registerBeanPostProcessors(beanFactory); initMessageSource(); initApplicationEventMulticaster();
 onRefresh(); // 如 Web 容器启动
 registerListeners(); finishBeanFactoryInitialization(beanFactory); finishRefresh(); }
-```
 
-```
 obtainFreshBeanFactory();
 ```
 

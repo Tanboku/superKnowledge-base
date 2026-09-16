@@ -84,16 +84,16 @@ Java 里的 for 和 foreach 看似都能遍历，但底层机制和适用场景�
 
 ```
 for (int i = 0; i < arr.length; i++) { System.out.println(arr[i]);
+}
 ```
 
-}
 2）foreach（增强 for）本质是 迭代器 的语法糖，编译后会转成 Iterator 的 hasNext() 和 next() 调用。它 屏蔽了索引细节，代码更简洁，也避免越界错误。但正因为没有索引，你没法在遍历过程中修改集合（比如 remove 不通过迭代器会抛 ConcurrentModificationException）。
 
 ```
 for (String s : list) { System.out.println(s);
+}
 ```
 
-}
 3）性能上，数组类型两者基本没差，JVM 会优化。但对 ArrayList 这种实现了 RandomAccess 的集合，for 通过 get(i) 访问很快。而 LinkedList 用 foreach 更好，因为每次 get(i) 都要从头遍历，O(n²) 的代价，压根不推荐。 4）foreach 不能用于需要并发修改的场景，也不能做条件跳步（比如 i += 2）。遇到这些情况，老老实实用传统 for 或 显式迭代器。 总的来说，能用 foreach 就用，代码干净安全。需要索引或复杂控制逻辑时，再切回 for。
 
 ## 10. 你使用过 Java 的反射机制吗？如何应用反射？
@@ -113,17 +113,12 @@ Java 里的继承，说白了就是子类可以拿父类的属性和方法来用
 ```
 class Animal {
 void sound() { System.out.println("叫了一声"); }
-```
-
 }
-
-```
 class Dog extends Animal {
 @Override
 void sound() { System.out.println("汪汪"); }
-```
-
 }
+```
 
 多态也是基于继承来的。你用 Animal a = new Dog() 这种写法，调 a.sound() 实际执行的是 Dog 的版 本，这就是运行时动态绑定。 不过别滥用继承。父类一改，子类可能就出问题。一般来说，is-a 关系才考虑继承，比如 Dog is an Animal 。要 是只是想复用代码，优先用组合，不然后期搞不定。
 
@@ -159,15 +154,11 @@ public ✅ ✅ ✅
 
 ```
 class Parent { static void say() { System.out.println("Parent static"); } void speak() { System.out.println("Parent instance"); }
-```
-
 }
 
-```
 class Child extends Parent { static void say() { System.out.println("Child static"); void speak() { System.out.println("Child instance"); }
-```
-
 }
+```
 
 } // 隐藏，非重写 // 重写
 
@@ -188,15 +179,19 @@ synchronized (obj) {
 ```
 
 obj.wait(); // 释放锁，进入等待
+
+```
 }
+```
+
 2） sleep() 是 Thread 类的静态方法，它只是让当前线程暂停指定时间，不释放任何锁。时间一到，线程进入就 绪状态等待 CPU 调度。
 
 ```
 try { Thread.sleep(1000);
 } catch (InterruptedException e) { Thread.currentThread().interrupt();
+}
 ```
 
-}
 关键区别在于锁的释放与协作机制。 wait() 是线程间通信的一部分，常用于生产者-消费者模式，配合 notify() 实现线程协作。而 sleep() 更像是“我先歇会儿”，跟同步无关。 还有一点， wait() 可以被外部唤醒， sleep() 虽然也能被中断，但需要捕获 InterruptedException ，并且 不会自动重新获取锁。 所以别搞混了，想做线程协调，用 wait()/notify() ；只想暂停一下，用 sleep() 就行。
 
 ## 16. PO、VO、BO、DTO、DAO、POJO 有什么区别？
@@ -221,9 +216,9 @@ Thread.startVirtualThread(() -> System.out.println("运行在虚拟线程"));
 
 ```
 if (obj instanceof Point(int x, int y)) { System.out.println(x + ", " + y);
+}
 ```
 
-}
 4）字符串模板（ STR ）是预览功能，取代繁琐的 String.format 或 StringBuilder 拼接。写 SQL 或 JSON 组装时特 别顺手。
 
 ```
@@ -241,9 +236,9 @@ class Parent { void show() { }
 } class Child extends Parent {
 @Override
 void show() { } // 重写
+}
 ```
 
-}
 重载更像是一个类内部的多个同名工具方法，像 Arrays.sort() 就有好几种参数形式；而重写是为了实现多态， 让 List<String> list = new ArrayList<>() 调用 list.add() 时，实际执行的是 ArrayList 的逻 辑。
 
 ## 20. Java17 有哪些新特性？
@@ -259,9 +254,9 @@ public sealed interface Shape permits Circle, Rect {} public record Circle(doubl
 ```
 switch (obj) {
 case String s -> System.out.println("字符串: " + s); case Integer i -> System.out.println("数字: " + i); default -> System.out.println("其他");
+}
 ```
 
-}
 3）移除了 Applet API，彻底跟老旧浏览器插件说再见。同时 ZGC 和 Shenandoah 在这个版本已经可用，大堆内存 （比如 1TB）下也能把 GC 停顿压到 10ms 以内，适合对延迟敏感的服务。 4）默认启用弹性元空间，减少 Full GC 中元空间回收的开销。底层实现上，把很多原来用 C++ 写的脏活累活交给了 Java，维护起来更方便。 总的来说，Java 17 更像是“成熟期”的一次加固，密封类和模式匹配这些特性，都在引导你写出更可读、更少出错的 代码。升级后一般不需要改业务逻辑，但能明显提升系统稳定性和可维护性。
 
 ## 21. Float 经过一系列的操作后(加减乘除)，如何判断是否和另一个数相等呢？
@@ -273,16 +268,16 @@ float a = 0.1f * 3; float b = 0.3f;
 // 错误做法 // if (a == b) // 可能为 false // 正确做法
 if (Math.abs(a - b) < 1e-6) {
 // 认为相等
+}
 ```
 
-}
 实际业务中，金融计算压根不会用 float 或 double ，而是上 BigDecimal 。像支付宝、银行系统这些对精度 要求高的场景，都是 BigDecimal 在扛住，因为它是基于十进制的精确计算。 有个细节是， 1e-6 这种阈值不是万能的，对于很大或很小的数值可能不适用。更稳妥的做法是结合相对误差：
 
 ```
 public static boolean floatEquals(float a, float b) { return Math.abs(a - b) <= Math.max(Math.ulp(a), Math.ulp(b));
+}
 ```
 
-}
 总之，浮点数判等别用 == ，要么用误差容忍比较，要么直接上 BigDecimal 做精确计算。
 
 ## 22. Java25 有哪些新特性？
@@ -324,15 +319,11 @@ String content = Files.readString(Path.of("data.txt"));
 
 ```
 public abstract class Animal { protected String name; public abstract void makeSound(); public void sleep() { System.out.println("Sleeping..."); }
-```
-
 }
-
-```
 public interface Flyable { default void fly() { System.out.println("Flying..."); }
+}
 ```
 
-}
 实际开发里，一般用抽象类做骨架实现，接口定义行为规范。像 JDK 里的 InputStream 是抽象类，因为有共用的 读取逻辑；而 Comparable 就是典型的能力接口。
 
 ## 26. Java 中的序列化和反序列化是什么？
@@ -341,9 +332,9 @@ public interface Flyable { default void fly() { System.out.println("Flying...");
 
 ```
 class User implements Serializable { private String name; private int age;
+}
 ```
 
-}
 2） 序列化时会生成一个 serialVersionUID ，用来校验版本一致性。如果反序列化时类结构变了，但 serialVersionUID 匹配，就能成功加载，否则抛 InvalidClassException 。建议显式定义它，避免因字段 变动导致意外失败。 3） 静态变量和被 transient 修饰的字段不会被序列化。比如密码这类敏感信息，可以用 transient 标记，让 它绕过持久化过程。 场景上，RMI、Dubbo 的网络调用底层就依赖序列化传对象。Redis 存 Java 对象时也常做序列化，比如用 JdkSerializationRedisSerializer。 不过默认的序列化性能差，产生的字节流大，跨语言也搞不定。实际项目里更多用 Kryo、Protobuf 或 JSON（如 Jackson）替代。
 
 ## 27. 为什么 Java 不支持多重继承？
@@ -439,11 +430,8 @@ String item = it.next(); System.out.println(item); }
 ```
 public class BankAccount { private double balance;
 public void deposit(double amount) { if (amount > 0) balance += amount;
-```
-
 }
 
-```
 public double getBalance() { return balance;
 } }
 ```
@@ -481,9 +469,8 @@ BigDecimal result = a.divide(b, 4, RoundingMode.HALF_UP); // 保留4位，四舍
 
 ```
 if (a.compareTo(b) == 0) { // 正确的值比较 // 相等
-```
-
 }
+```
 
 ## 36. Java 泛型擦除是什么？
 
@@ -504,9 +491,9 @@ JVM 执行时，解释器逐条读取字节码并执行，热点代码会被 即
 
 ```
 public class Add { public static int add() { return 1 + 2; }
+}
 ```
 
-}
 反编译后你会看到：
 
 ```
@@ -555,11 +542,8 @@ Java 里所有参数传递都是按值传递，不存在按引用传递。这个
 
 ```
 void modify(Person p) { p.name = "new"; p = new Person();
-```
-
 }
 
-```
 // 外部可见，改的是共享对象 // 外部不可见，只是参数副本换了指向
 ```
 
@@ -573,17 +557,9 @@ void modify(Person p) { p.name = "new"; p = new Person();
 public final class ImmutableUser { private final String name; private final List<String> tags;
 public ImmutableUser(String name, List<String> tags) { this.name = name;
 this.tags = new ArrayList<>(tags); // 深拷贝
-```
-
 }
-
-```
 public String getName() { return name;
-```
-
 }
-
-```
 public List<String> getTags() {
 return Collections.unmodifiableList(tags); // 只读视图
 } }
@@ -604,11 +580,7 @@ Java 里 Exception 和 Error 都继承自 Throwable，但代表的完全是两�
 ```
 // 面向过程风格
 void processOrder(long userId, List<Item> items) { if (!Inventory.check(items)) throw new IllegalStateException(); double price = Pricing.calc(items); long orderId = DB.saveOrder(userId, items, price); Notification.send(userId, "Order " + orderId + " created");
-```
-
 }
-
-```
 // 面向对象风格 orderService.placeOrder(user, items); // 内部流转，对外透明
 ```
 
@@ -635,7 +607,11 @@ public class Outer {
 ```
 
 static class Nested { } // 不依赖外部类实例
+
+```
 }
+```
+
 内部类最终会被编译成独立的 .class 文件，比如 Outer$Inner.class ，JVM 其实并不认识“内部类”这个概 念，全是靠编译器生成代码和桥接方法实现的。
 
 ## 46. Java8 有哪些新特性？
@@ -659,9 +635,9 @@ String s = ""; for (int i = 0; i < 1000; i++) {
 ```
 
 s += "a"; // 每次都 new 对象
-}
 
 ```
+}
 // 正确做法
 StringBuilder sb = new StringBuilder(); for (int i = 0; i < 1000; i++) {
 sb.append("a"); } String result = sb.toString();
@@ -712,19 +688,14 @@ c == d; // false，两个不同对象
 ```
 @Override public boolean equals(Object o) {
 if (this == o) return true; if (!(o instanceof User)) return false; User user = (User) o; return age == user.age && Objects.equals(name, }
-```
 
-```
 user.name);
-```
 
-```
 @Override
 public int hashCode() {
 return Objects.hash(name, age); // 字段要和 equals 保持一致
-```
-
 }
+```
 
 简单说，这两个方法得“绑定”着重写，不然像 HashSet、HashMap 这些依赖哈希行为的集合就会出错。
 
@@ -765,9 +736,9 @@ Enhancer.create(Class, Callback)
 @Retention(RetentionPolicy.RUNTIME) @interface MyConfig {
 String value(); }
 public class Example { @MyConfig("test") public void run() {}
+}
 ```
 
-}
 拿到方法上的注解：
 
 ```
@@ -805,9 +776,9 @@ Java 泛型的上下界限定符，是用来约束类型参数取值范围的语
 
 ```
 public static <T> void copy(List<? super T> dest, List<? extends T> src) { for (int i = 0; i < src.size(); i++) { dest.set(i, src.get(i)); }
+}
 ```
 
-}
 记住 PECS 原则：Producer-extends, Consumer-super。如果是生产数据的地方，用上界；消费数据的地方，用下 界。
 
 ## 58. Java 中的深拷贝和浅拷贝有什么区别？
@@ -818,9 +789,7 @@ public static <T> void copy(List<? super T> dest, List<? extends T> src) { for (
 public class Person implements Cloneable { String name;
 Address address; // 引用类型
 public Person clone() throws CloneNotSupportedException { Person copy = (Person) super.clone();
-```
 
-```
 copy.address = (Address) address.clone(); // 手动深拷贝引用对象
 return copy; } }
 ```
@@ -892,7 +861,7 @@ try {
 // 可能出错的代码
 } finally {
 // 总会执行，比如 close()
+}
 ```
 
-}
 finalize 是 Object 类的一个方法，每个对象都有。以前设计是用来做垃圾回收前的清理工作，但现在根本不推荐用。 因为它的执行时机完全不可控，可能永远不被调用，Java 9 开始已经标记为 deprecated 了。真要清理资源，应该用 try-with-resources 或者手动 close。 这三个词唯一共同点就是都以 "final" 开头，别的啥关系都没有。

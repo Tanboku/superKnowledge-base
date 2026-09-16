@@ -1,0 +1,16 @@
+{
+  "promptDelete": false,
+  "alwaysUpdateLinks": true,
+  "newFileLocation": "current",
+  "newLinkFormat": "relative",
+  "useMarkdownLinks": true,
+  "showUnsupportedFiles": true,
+  "attachmentFolderPath": "assets",
+  "spellcheck": true,
+  "showLineNumber": true,
+  "tabSize": 2,
+  "readableLineLength": true,
+  "strictLineBreaks": true,
+  "autoConvertHtml": true,
+  "livePreview": true
+}

@@ -1,0 +1,11 @@
+{
+  "accentColor": "#6c6ae4",
+  "showViewHeader": true,
+  "nativeMenus": true,
+  "theme": "adapt",
+  "interfaceFontFamily": "",
+  "textFontFamily": "",
+  "monospaceFontFamily": "",
+  "baseFontSize": 16,
+  "enabledCssSnippets": []
+}

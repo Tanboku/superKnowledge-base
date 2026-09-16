@@ -1,8 +1,6 @@
 # Java学习路线
 
-> Java 学习路线总览，原图见 assets/java-roadmap.png
-
-![[java-roadmap.png]]
+> Java 学习路线总览
 
 ## 阶段导航
 
